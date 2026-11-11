@@ -112,6 +112,23 @@
         "type": "github"
       }
     },
+    "linux-dfl-backport": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1754943353,
+        "narHash": "sha256-QZopl3e6nb7tCOIB+vF7MKHPHTOShSlsR3NoRNxMs9s=",
+        "owner": "OFS",
+        "repo": "linux-dfl-backport",
+        "rev": "1d01b806f5bd7c65e2e46c37d43ba4aa6a4a047c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "OFS",
+        "repo": "linux-dfl-backport",
+        "rev": "1d01b806f5bd7c65e2e46c37d43ba4aa6a4a047c",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1782847189,
@@ -149,6 +166,7 @@
       "inputs": {
         "flake-utils": "flake-utils",
         "fpga-nix": "fpga-nix",
+        "linux-dfl-backport": "linux-dfl-backport",
         "nixpkgs": "nixpkgs",
         "opae-sdk": "opae-sdk"
       }

@@ -14,6 +14,11 @@
       url = "github:OFS/opae-sdk/2.13.0-3";
       flake = false;
     };
+    # Out-of-tree DFL drivers. The branch moves, so pin the commit.
+    linux-dfl-backport = {
+      url = "github:OFS/linux-dfl-backport/1d01b806f5bd7c65e2e46c37d43ba4aa6a4a047c";
+      flake = false;
+    };
   };
 
   outputs =
@@ -22,8 +27,23 @@
       flake-utils,
       fpga-nix,
       opae-sdk,
+      linux-dfl-backport,
       ...
     }:
+    let
+      dflDriverVersion = "6.6-lts";
+      ofsLib = {
+        mkDflDriverPackages =
+          args:
+          import ./lib/mkDflDriverPackages.nix (
+            {
+              src = linux-dfl-backport;
+              version = dflDriverVersion;
+            }
+            // args
+          );
+      };
+    in
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (
       system:
       let
@@ -60,6 +80,14 @@
         # embedded Python finds OPAE's modules. Without a device or /sys, tools
         # may still exit with an error, so only loader, import and crash
         # failures count.
+        # The drivers build against the kernel series of the backport branch.
+        # Sites build them for their own kernels with lib.mkDflDriverPackages.
+        checks.dfl-drivers = pkgs.callPackage ./pkgs/dfl-drivers.nix {
+          src = linux-dfl-backport;
+          version = dflDriverVersion;
+          kernel = pkgs.linuxPackages_6_6.kernel;
+        };
+
         checks.opae-tools = pkgs.runCommand "ofs-nix-opae-tools" { } ''
           ${opae}/bin/fpgainfo --version | grep -F 2.13.0
           failed=0
@@ -90,5 +118,8 @@
 
         formatter = pkgs.nixfmt-tree;
       }
-    );
+    )
+    // {
+      lib = ofsLib;
+    };
 }
