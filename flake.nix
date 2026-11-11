@@ -102,12 +102,22 @@
     flake-utils.lib.eachSystem [ "x86_64-linux" ] (
       system:
       let
-        pkgs = import nixpkgs { inherit system; };
+        pkgs = import nixpkgs {
+          inherit system;
+          # Only the prebuilt FIM images, which contain Intel IP, are unfree.
+          config.allowUnfreePredicate =
+            pkg: nixpkgs.lib.hasPrefix "ofs-fim-images-" (nixpkgs.lib.getName pkg);
+        };
         opae = opaeFor pkgs;
       in
       {
         packages = {
           inherit opae;
+          fim-images-iseries-dk = pkgs.callPackage ./pkgs/fim-images.nix {
+            release = "2024.2-1";
+            board = "iseries-dk";
+            hash = "sha256-VqRiNe0TmoJ0gPAoJLVBLPWsGhjpooyqZWnCotV7VWE=";
+          };
           default = opae;
         };
 
