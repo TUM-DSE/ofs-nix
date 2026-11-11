@@ -9,14 +9,15 @@
   board,
   hash,
 }:
+let
+  file = "${board}-images_ofs-${lib.replaceStrings [ "." ] [ "-" ] release}.tar.gz";
+in
 stdenvNoCC.mkDerivation {
   pname = "ofs-fim-images-${board}";
   version = release;
 
   src = fetchurl {
-    url = "https://github.com/OFS/ofs-agx7-pcie-attach/releases/download/ofs-${release}/${board}-images_ofs-${
-      lib.replaceStrings [ "." ] [ "-" ] release
-    }.tar.gz";
+    url = "https://github.com/OFS/ofs-agx7-pcie-attach/releases/download/ofs-${release}/${file}";
     inherit hash;
   };
 

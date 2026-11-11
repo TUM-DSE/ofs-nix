@@ -69,3 +69,6 @@ IDs of current OFS shells, such as `8086:bcce`.
 ## Packages
 
 - `opae`: the OPAE SDK. nixpkgs removed its package in 2025.
+- `fim-images-iseries-dk`: Intel's prebuilt OFS 2024.2 FIM for the I-Series
+  dev kit (`ofs_top.sof`, the default AFU `.gbs`, the FME interface ID and the
+  PR build template). Loading it needs no Quartus license.
