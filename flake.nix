@@ -14,6 +14,19 @@
       url = "github:OFS/opae-sdk/2.13.0-3";
       flake = false;
     };
+    # The OFS 2024.2 FIM for Agilex 7 PCIe attach boards. It is the newest
+    # release for Quartus 24.1, which also needs patches 0.18 and 0.26.
+    ofs-agx7-pcie-attach = {
+      type = "git";
+      url = "https://github.com/OFS/ofs-agx7-pcie-attach";
+      ref = "refs/tags/ofs-2024.2-1";
+      submodules = true;
+      flake = false;
+    };
+    ofs-platform-afu-bbb = {
+      url = "github:OFS/ofs-platform-afu-bbb/ofs-2024.2-1";
+      flake = false;
+    };
     # Out-of-tree DFL drivers. The branch moves, so pin the commit.
     linux-dfl-backport = {
       url = "github:OFS/linux-dfl-backport/1d01b806f5bd7c65e2e46c37d43ba4aa6a4a047c";
@@ -28,6 +41,8 @@
       fpga-nix,
       opae-sdk,
       linux-dfl-backport,
+      ofs-agx7-pcie-attach,
+      ofs-platform-afu-bbb,
       ...
     }:
     let
@@ -42,13 +57,27 @@
             }
             // args
           );
+
+        # Defaults to the pinned OFS 2024.2 FIM, its platform BBB and OPAE.
+        mkOfsFimPackage =
+          args:
+          import ./lib/mkOfsFimPackage.nix (
+            {
+              fpgaNixLib = fpga-nix.lib;
+              src = ofs-agx7-pcie-attach;
+              platformAfuBbb = ofs-platform-afu-bbb;
+              opae = opaeFor args.pkgs;
+            }
+            // args
+          );
+
+        # The Quartus version the pinned OFS release needs.
+        quartusVersion = "24.1";
       };
-    in
-    flake-utils.lib.eachSystem [ "x86_64-linux" ] (
-      system:
-      let
-        pkgs = import nixpkgs { inherit system; };
-        opae = pkgs.callPackage ./pkgs/opae-sdk.nix {
+
+      opaeFor =
+        pkgs:
+        pkgs.callPackage ./pkgs/opae-sdk.nix {
           src = opae-sdk;
           version = "2.13.0-3";
           # OPAE pins CLI11 2.1.2. Newer versions reject some of its option names.
@@ -69,6 +98,12 @@
             };
           });
         };
+    in
+    flake-utils.lib.eachSystem [ "x86_64-linux" ] (
+      system:
+      let
+        pkgs = import nixpkgs { inherit system; };
+        opae = opaeFor pkgs;
       in
       {
         packages = {
@@ -87,6 +122,20 @@
           version = dflDriverVersion;
           kernel = pkgs.linuxPackages_6_6.kernel;
         };
+
+        # The FIM needs Quartus and a license to build, so only check that it
+        # evaluates for the I-Series dev kit with the PR template.
+        checks.fim-eval =
+          let
+            quartusShareRoot = "/nonexistent/intel-fpga/tools";
+            fim = ofsLib.mkOfsFimPackage {
+              inherit pkgs quartusShareRoot;
+              intelTools = fpga-nix.lib.mkIntelTools { inherit pkgs quartusShareRoot; };
+              inherit (ofsLib) quartusVersion;
+              target = "iseries-dk";
+            };
+          in
+          pkgs.writeText "ofs-nix-fim-eval" (builtins.unsafeDiscardOutputDependency fim.drvPath);
 
         checks.opae-tools = pkgs.runCommand "ofs-nix-opae-tools" { } ''
           ${opae}/bin/fpgainfo --version | grep -F 2.13.0

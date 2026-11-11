@@ -145,6 +145,42 @@
         "type": "github"
       }
     },
+    "ofs-agx7-pcie-attach": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1719874895,
+        "narHash": "sha256-xFR2LrKMPNNVOZQtb/i1FGghqBtdWmePhdsdvb8K9SA=",
+        "ref": "refs/tags/ofs-2024.2-1",
+        "rev": "ab9d0728a68caa353d720c837237f54eb88db6f8",
+        "revCount": 154,
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/OFS/ofs-agx7-pcie-attach"
+      },
+      "original": {
+        "ref": "refs/tags/ofs-2024.2-1",
+        "submodules": true,
+        "type": "git",
+        "url": "https://github.com/OFS/ofs-agx7-pcie-attach"
+      }
+    },
+    "ofs-platform-afu-bbb": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1717521557,
+        "narHash": "sha256-VKrHuMZSiMwc563Spg/aw21x+Hhh+NIsmcorFf2dO3I=",
+        "owner": "OFS",
+        "repo": "ofs-platform-afu-bbb",
+        "rev": "e0251f7d00f37176df7f63c15fd9ad4ab609137e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "OFS",
+        "ref": "ofs-2024.2-1",
+        "repo": "ofs-platform-afu-bbb",
+        "type": "github"
+      }
+    },
     "opae-sdk": {
       "flake": false,
       "locked": {
@@ -168,6 +204,8 @@
         "fpga-nix": "fpga-nix",
         "linux-dfl-backport": "linux-dfl-backport",
         "nixpkgs": "nixpkgs",
+        "ofs-agx7-pcie-attach": "ofs-agx7-pcie-attach",
+        "ofs-platform-afu-bbb": "ofs-platform-afu-bbb",
         "opae-sdk": "opae-sdk"
       }
     },

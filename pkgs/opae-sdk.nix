@@ -86,8 +86,8 @@ stdenv.mkDerivation {
       --replace-fail 'set(OPAE_LIB_INSTALL_DIR "lib64"' 'set(OPAE_LIB_INSTALL_DIR "lib"'
 
     # The install step ignores pip failures. Make them fatal.
-    sed -i '/^ *WORKING_DIRECTORY ''${OPAE_PYTHON_INSTALL_SOURCE_DIR}$/a COMMAND_ERROR_IS_FATAL ANY' \
-      cmake/modules/OPAEPackaging.cmake
+    workdir='^ *WORKING_DIRECTORY ''${OPAE_PYTHON_INSTALL_SOURCE_DIR}$'
+    sed -i "/$workdir/a COMMAND_ERROR_IS_FATAL ANY" cmake/modules/OPAEPackaging.cmake
     test "$(grep -c '^COMMAND_ERROR_IS_FATAL ANY$' cmake/modules/OPAEPackaging.cmake)" = 1
   '';
 
