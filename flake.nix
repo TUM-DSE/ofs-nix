@@ -5,7 +5,7 @@
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
     flake-utils.url = "github:numtide/flake-utils";
     fpga-nix = {
-      url = "github:TUM-DSE/fpga-nix/feature/intel-quartus";
+      url = "github:TUM-DSE/fpga-nix/feature/quartus-license-relay";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -134,7 +134,8 @@
         };
 
         # The FIM needs Quartus and a license to build, so only check that it
-        # evaluates for the I-Series dev kit with the PR template.
+        # evaluates for the I-Series dev kit with the PR template, and that the
+        # license relay points Quartus at the local listener.
         checks.fim-eval =
           let
             quartusShareRoot = "/nonexistent/intel-fpga/tools";
@@ -143,8 +144,10 @@
               intelTools = fpga-nix.lib.mkIntelTools { inherit pkgs quartusShareRoot; };
               inherit (ofsLib) quartusVersion;
               target = "iseries-dk";
+              licenseRelay.socketDir = "/run/intel-fpga-license";
             };
           in
+          assert fim.FPGA_NIX_QUARTUS_LICENSE_FILE == "27010@localhost";
           pkgs.writeText "ofs-nix-fim-eval" (builtins.unsafeDiscardOutputDependency fim.drvPath);
 
         checks.opae-tools = pkgs.runCommand "ofs-nix-opae-tools" { } ''

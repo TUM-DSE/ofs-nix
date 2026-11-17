@@ -24,6 +24,9 @@
   ofss ? [ ],
   prTemplate ? true,
   licenseFile ? null,
+  # Floating licenses through the build host's relay, as
+  # { socketDir, ports ? [ 27010 27011 ] }; see fpga-nix's licenseRelay.
+  licenseRelay ? null,
   pname ? "ofs-fim-${target}",
   version ? "0.1.0",
   cores ? 16,
@@ -34,6 +37,17 @@ let
 
   synTop = "work/syn/board/${target}/syn_top";
 
+  relay =
+    if licenseRelay == null then
+      {
+        toolRoots = [ ];
+        nativeBuildInputs = [ ];
+        env = { };
+        preBuild = "";
+      }
+    else
+      fpgaNixLib.mkQuartusLicenseRelay ({ inherit pkgs; } // licenseRelay);
+
   buildFlags =
     lib.optional prTemplate "-p"
     ++ lib.optionals (ofss != [ ]) [
@@ -41,6 +55,9 @@ let
       (lib.concatMapStringsSep "," toString ofss)
     ];
 in
+assert lib.assertMsg (
+  licenseFile == null || licenseRelay == null
+) "mkOfsFimPackage: set licenseFile or licenseRelay, not both";
 fpgaNixLib.mkStagePackage {
   inherit
     pkgs
@@ -58,15 +75,18 @@ fpgaNixLib.mkStagePackage {
     pkgs.python3
     pkgs.rsync
     pkgs.which
-  ];
-  toolRoots = [ quartusShareRoot ];
+  ]
+  ++ relay.nativeBuildInputs;
+  toolRoots = [ quartusShareRoot ] ++ relay.toolRoots;
   env = {
     FPGA_NIX_QUARTUS_VERSION = quartusVersion;
     OFS_PLATFORM_AFU_BBB = toString platformAfuBbb;
   }
   // lib.optionalAttrs (licenseFile != null) {
     FPGA_NIX_QUARTUS_LICENSE_FILE = toString licenseFile;
-  };
+  }
+  // relay.env;
+  inherit (relay) preBuild;
   executionKind = "ofs-fim-stage-execution";
   buildCommands = [
     ''export OFS_ROOTDIR="$PWD"''
