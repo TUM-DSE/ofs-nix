@@ -31,6 +31,9 @@ ofs-nix.lib.mkOfsFimPackage {
   quartusShareRoot = "/share/intel-fpga/tools";
   quartusVersion = ofs-nix.lib.quartusVersion; # "24.1"
   target = "iseries-dk";
+  # Or, for floating licenses through the build host's relay (fpga-nix's
+  # licenseRelay, doctor-cluster-config's intel-fpga-license module):
+  # licenseRelay.socketDir = "/run/intel-fpga-license";
   licenseFile = "/path/to/license.dat";
 }
 ```

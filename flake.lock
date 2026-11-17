@@ -74,16 +74,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1794428114,
-        "narHash": "sha256-VsSe+8WtJHBfej+6c60iy0Y+ziNSenMf0dBIOdOYH2o=",
+        "lastModified": 1794945492,
+        "narHash": "sha256-6X3GpovYBXnSthQskK7HI24cGhLRjdffRw3RBuRPDn4=",
         "owner": "TUM-DSE",
         "repo": "fpga-nix",
-        "rev": "abac90d110fa956506b2fd044ed24928f15fdd4e",
+        "rev": "8812175f6a7ca2b893318cff0892cec665b88cfc",
         "type": "github"
       },
       "original": {
         "owner": "TUM-DSE",
-        "ref": "feature/intel-quartus",
+        "ref": "feature/quartus-license-relay",
         "repo": "fpga-nix",
         "type": "github"
       }
